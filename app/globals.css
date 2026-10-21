@@ -1,0 +1,301 @@
+@import "tailwindcss";
+
+/*
+ * Theming
+ * -------
+ * The theme is driven by a single `data-theme` attribute on <html>, set before
+ * first paint by the inline script in app/layout.tsx. Every surface/text colour
+ * in the app is expressed as a semantic token below, so components never need a
+ * `dark:` variant — the token simply resolves to a different value.
+ *
+ * The `dark` variant is still registered for the rare case where a rule has to
+ * differ structurally (not just in colour) between the two themes.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------- Light --
+ * Warm paper rather than stark white, so the editorial character of the
+ * dark theme survives the flip. Accent is a deepened version of the dark
+ * accent: the same hue, dark enough to stay readable on a light surface.
+ */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --surface: #f7f5f2;
+  --surface-raised: #ffffff;
+
+  --content: #1d1d1d;
+  --content-muted: #56524c;
+  --content-subtle: #7d776f;
+
+  --line: rgb(29 29 29 / 0.14);
+  --line-strong: rgb(29 29 29 / 0.3);
+
+  --accent: #9a5b24;
+  --on-accent: #ffffff;
+
+  /* Inverted pair — used by solid buttons that must read as "filled". */
+  --invert: #1d1d1d;
+  --on-invert: #f7f5f2;
+
+  /* Translucent panel for glass surfaces that sit over the 3D canvas. */
+  --surface-glass: rgb(255 255 255 / 0.72);
+
+  /* Shadows are warm-tinted rather than neutral black — on a paper surface a
+     grey shadow reads as dirt, a warm one reads as light. */
+  --elev-1:
+    0 1px 2px rgb(61 48 35 / 0.05), 0 2px 8px rgb(61 48 35 / 0.04);
+  --elev-2:
+    0 2px 4px rgb(61 48 35 / 0.05), 0 10px 28px rgb(61 48 35 / 0.07);
+  --elev-3:
+    0 4px 10px rgb(61 48 35 / 0.06), 0 24px 56px rgb(61 48 35 / 0.1);
+  /* Catches the top edge of a raised panel, the way a lit surface would. */
+  --edge-highlight: inset 0 1px 0 rgb(255 255 255 / 0.9);
+
+  --glow-accent: rgb(154 91 36 / 0.16);
+  --ambient-top: rgb(154 91 36 / 0.05);
+  --ambient-bottom: rgb(29 29 29 / 0.035);
+
+  /* Glass: a pane catching light from above-left, not a flat tinted box. */
+  /* Light enough that the slabs behind stay legible through the pane. */
+  --glass-from: rgb(255 255 255 / 0.66);
+  --glass-to: rgb(255 255 255 / 0.44);
+  --glass-border: rgb(29 29 29 / 0.09);
+  --glass-sheen: rgb(255 255 255 / 0.95);
+  --glass-shadow: 0 28px 70px rgb(61 48 35 / 0.14);
+  /* Specular pool that follows the cursor across the pane. */
+  --glass-glow: rgb(154 91 36 / 0.14);
+
+  /* Barely-there lift under large display type. */
+  --display-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+/* ----------------------------------------------------------------- Dark -- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface: #1d1d1d;
+  --surface-raised: #232323;
+
+  --content: #f2f1ef;
+  --content-muted: #a6a29c;
+  --content-subtle: #7d776f;
+
+  --line: rgb(242 241 239 / 0.12);
+  --line-strong: rgb(242 241 239 / 0.28);
+
+  --accent: #d8a373;
+  --on-accent: #1d1d1d;
+
+  --invert: #f2f1ef;
+  --on-invert: #1d1d1d;
+
+  --surface-glass: rgb(38 38 38 / 0.62);
+
+  /* On a dark surface a cast shadow barely reads, so depth comes mostly from
+     the lit top edge. Both are kept so the two themes share one API. */
+  --elev-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.28);
+  --elev-2: 0 2px 4px rgb(0 0 0 / 0.45), 0 10px 28px rgb(0 0 0 / 0.38);
+  --elev-3: 0 4px 10px rgb(0 0 0 / 0.5), 0 24px 56px rgb(0 0 0 / 0.5);
+  --edge-highlight: inset 0 1px 0 rgb(255 255 255 / 0.07);
+
+  --glow-accent: rgb(216 163 115 / 0.2);
+  --ambient-top: rgb(216 163 115 / 0.07);
+  --ambient-bottom: rgb(0 0 0 / 0.25);
+
+  /* Sits over the lit 3D scene, so it carries more tint than a pane over flat
+     background would — enough that body copy stays readable across it. */
+  --glass-from: rgb(48 48 48 / 0.5);
+  --glass-to: rgb(26 26 26 / 0.36);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-sheen: rgb(255 255 255 / 0.26);
+  --glass-shadow: 0 28px 70px rgb(0 0 0 / 0.55);
+  --glass-glow: rgb(216 163 115 / 0.16);
+
+  --display-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display), var(--font-geist-sans), sans-serif;
+
+  /* Typography.tsx has always carried `3xl:` classes, but Tailwind v4 stops at
+     `2xl` by default, so every one of them was silently dropped. Registering
+     the breakpoint makes the scale that the components already describe real. */
+  --breakpoint-3xl: 120rem;
+
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-content-subtle: var(--content-subtle);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+
+  --color-invert: var(--invert);
+  --color-on-invert: var(--on-invert);
+
+  --color-surface-glass: var(--surface-glass);
+  --color-glow-accent: var(--glow-accent);
+
+  --shadow-elev-1: var(--elev-1);
+  --shadow-elev-2: var(--elev-2);
+  --shadow-elev-3: var(--elev-3);
+  --shadow-edge: var(--edge-highlight);
+
+  /* Used by every depth transition so motion reads as one material. */
+  --ease-out-depth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--surface);
+  color: var(--content);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Soften the moment of the switch without animating ordinary hover states. */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  [data-theme-surface] {
+    transition:
+      background-color 300ms ease,
+      color 300ms ease,
+      border-color 300ms ease;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------- Depth --
+ * A handful of composable primitives so "raised panel" and "sits in a lit
+ * room" mean the same thing everywhere, in both themes.
+ */
+
+/** Soft directional light washing the section, warm at the top. */
+@utility ambient-field {
+  background-image:
+    radial-gradient(
+      70% 55% at 72% 8%,
+      var(--ambient-top) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      90% 60% at 10% 100%,
+      var(--ambient-bottom) 0%,
+      transparent 70%
+    );
+}
+
+/** A panel that reads as a physical surface lifted off the page. */
+@utility panel {
+  background-color: var(--surface-raised);
+  box-shadow: var(--elev-2), var(--edge-highlight);
+}
+
+@utility panel-flat {
+  background-color: var(--surface-raised);
+  box-shadow: var(--elev-1), var(--edge-highlight);
+}
+
+/** Establishes a 3D context for pointer-tilt cards. */
+/**
+ * Translucent pane. The gradient plus the lit top edge are what make it read
+ * as glass; a flat tint at the same opacity just looks like a dimmed box.
+ */
+@utility glass {
+  position: relative;
+  background-image: linear-gradient(
+    150deg,
+    var(--glass-from) 0%,
+    var(--glass-to) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+}
+
+/* The sheen fades out before the corners so the edge never looks drawn on. */
+@utility glass {
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 1px;
+    top: 0;
+    height: 1px;
+    pointer-events: none;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--glass-sheen) 28%,
+      var(--glass-sheen) 62%,
+      transparent 100%
+    );
+  }
+}
+
+/* Without backdrop-filter the pane would be a flat wash, so lean on the
+   solid raised surface instead of faking transparency. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: var(--surface-raised);
+    background-image: none;
+  }
+}
+
+@utility stage {
+  perspective: 1200px;
+  perspective-origin: center;
+}
+
+@utility stage-near {
+  perspective: 800px;
+  perspective-origin: center;
+}
+
+/** Children of a tilting card keep their own depth instead of flattening. */
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* The float keyframes are shared by the CSS fallback composition and by the
+   decorative glyphs, so reduced-motion only has to be handled in one place. */
+@keyframes depth-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
